@@ -1,3 +1,6 @@
+[![Discord](https://img.shields.io/discord/616889479298547722?logo=discord)](https://discord.gg/P82fEmE)
+[![License](https://img.shields.io/github/license/Open-RFlab/Open-RFlab)](LICENSE)
+
 # Open-RFlab
 
 ## Description
