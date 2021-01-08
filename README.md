@@ -26,12 +26,13 @@ Or to send an email : thomas.lepoix@protonmail.ch
 
 An interface to export microstrip Qucs schematics to KiCad layouts/footprints, pcb-rnd layouts and OpenEMS simulations. One of the easiest ways to perform FDTD on microstrip circuits.
 
-### [oemsgen]() (OpenEMS script generator) [ASAP]
+### [octave-openems-hll](https://github.com/Open-RFlab/octave-openems-hll) (OpenEMS High-level layer) [Usable]
 
-As the Qucs-RFlayout developer, I think that it is a good approach for a `somewhat2openems` converter to produce a whole script and not only an octave function containing shapes for example and letting the user write its script. The Qucs-RFlayout strength regarding other existing converters is the effort to provide a correct postprocessing and a correct script CLI. I'd like to extract this part of my code to a library and start collaborating with other project such as [pcbmodelgen](https://github.com/jcyrax/pcbmodelgen), [pcb-rnd](https://github.com/evanfoss/pcb2csx), [pyems](https://github.com/matthuszagh/pyems) or [this project](https://www.openems.de/forum/viewtopic.php?f=6&t=831&sid=1194aeef8461b6cde786fa41c02eb7c6).
-That would lead to a more uniform OpenEMS interface from the user side and also open possibilities to wrap script execution in some GUI.
+This is an effort to standardize OpenEMS interface and particularly to provide out of the box post-processing functions.
+Intended to be used by manual script developpers and especially by `somewhat -> openems` converter tool developpers.
+Might be ported to Python and merged/integrated to [pyems](https://github.com/matthuszagh/pyems).
 
-This will become soon an invitation to work together. :)
+A more uniform OpenEMS interface from the user side also opens possibilities to wrap script execution in some GUI.
 
 ### [AlanSmithee](https://github.com/Open-RFlab/AlanSmithee) (Smith chart utility) [WIP]
 
@@ -53,14 +54,12 @@ We have to group some existing tutorials and write some others, mostly about wor
 
 Qucs is currently surviving because active developers are too few to face the work quantity. If a C++/Qt developer with a lot of free time and experience in dealing with legacy code read this, here is a useful thing to do, the community would be so grateful. ;)
 
-### Enhancing [OpenEMS](https://github.com/thliebig/openEMS) [TODO]
+### Enhancing [OpenEMS](https://github.com/thliebig/openEMS-Project) [TODO]
 
 - The most important OpenEMS enhancement would be an automatic and performant mesher. Some existing tools already contain their own, maybe porting one to an Octave / Python function would be a good solution? Need discussion.
 
 - Making the circuit design possible and user friendly trough appCSXCAD. [This project](https://www.openems.de/forum/viewtopic.php?f=6&t=831&sid=1194aeef8461b6cde786fa41c02eb7c6) is (was?) about that.
 
-- Adding better and easier postprocessing functions. [Qucs-RFlayout](https://github.com/thomaslepoix/Qucs-RFlayout) ships reworked versions of `plotFF3D.m` and `plotRefl.m`.
-
+<!--
 ## "Exhaustive" list of softwares compounding the ecosystem
-
-TODO
+-->
