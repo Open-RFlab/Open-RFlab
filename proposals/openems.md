@@ -1,14 +1,12 @@
 # OpenEMS rework proposition
 
-## Brief
-
-**Proposition of** an XML file format extension
-**in order of** making OpenEMS a set of standalone tools with a project style system
-**instead of** a set of mixed interfaces glued in Octave/Python scripts.
-
 ## Abstract
 
-I'd like OpenEMS to be usable without an Octave or Python API, but instead like a suite of tools that do what they meant and share data using files, just like projects like KiCad or gEDA do.
+I'd like [OpenEMS](https://openems.de) to be usable without an Octave or Python API, but instead like a suite of tools that do what they meant and share data using files, just like projects like KiCad or gEDA do.
+
+But it worth mentioning I don't want this workflow to replace the legacy one but both to **coexist** and moreover, to be **compatible**.
+
+I think an extension of the XML file format used by OpenEMS would lead to this situation.
 
 ### Current state
 
@@ -33,7 +31,9 @@ In a first time a software designated as "project manager" would let you edit al
 An other tool would be the "runner", that would ease the interaction of the different software of the suite (AppCSXCAD, mesher, OpenEMS, NF2FF, postprocessor), just like the KiCad application does nothing more than letting you switching between Eeschema, PcbNew, GerbView, etc.
 Using this tool would of course not be mandatory to use OpenEMS.
 
-### Benefices
+**Note:** Support for this file format extension will probably be implemented in the Octave API first (through [octave-openems-hll](https://github.com/Open-RFlab/octave-openems-hll) in a first time).
+
+### Benefits
 
 The big advantage of this enhancement of the file format would be the total decoupling of the different tools of the suite, thus a postprocessor could be totally interchangeable with another, the same with meshers and so on.
 Adoption of this file format would immediately make different integrations of OpenEMS (dedicated to different purpose) compatible with each other. For example if a team conceive a board and perform signal integrity in their engineering workflow, and a 3rd party take a look to the project and wants to observe the far field radiations of the board, it would just be about using a different postprocessor, not about spending hours to adapt a script.
@@ -42,17 +42,31 @@ Also the addition of a new paragraph to the file format would be totally backwar
 
 ## Architecture overview
 
-Here are two schematics of the OpenEMS workflow. (Drawio editable svg)
+<p align="center">
+  <img
+    title="openems_legend.svg"
+    src="res/openems_legend.svg"
+    width="50%"
+  >
+</p>
 
-![openems_current_workflow.svg](res/openems_current_workflow.svg)
+Here are three schematics of the OpenEMS workflow, considering the legend above. (Drawio editable svg)
 
-This is how OpenEMS currently works (considering an octave-openems-hll based script that is quite canonical in term of decoupling steps and of postprocessing capabilities).
+<p align="center">
+  <img
+    title="openems_current_octave_workflow.svg"
+    src="res/openems_current_octave_workflow.svg"
+    width="80%"
+  >
+</p>
+
+This is how OpenEMS currently works (considering an [octave-openems-hll](https://github.com/Open-RFlab/octave-openems-hll) based script that is quite canonical in term of decoupling steps and of postprocessing capabilities).
 
 In orange are the problematic parts :
 - The port knowledge input of the postprocessor that comes from inside the script instead of the file.
 - The `nf2ff.xml` that has an unique immutable name and is overwritten each time we run a different far field computation. The unique name is how the association between CSX and NF2FF file is currently done.
 
-![openems_proposed_workflow.svg](res/openems_proposed_workflow.svg)
+![openems_proposed_standalone_workflow.svg](res/openems_proposed_standalone_workflow.svg)
 
 That is how the tool suite could interact without being driven by an Octave script, based on the XML file format extension proposed here.
 
@@ -60,6 +74,17 @@ In orange are the crucial parts :
 - The runner that triggers every other executable (except a 3rd party converter of course).
 - The project manager that would propose an editing interface to the `csx.xml`' new paragraph. And then that would generate the different `nf2ff_<>.xml` based on the user NF2FF configuration (those NF2FF XML files would be known by the `csx.xml` file).
 - The postprocessor would read the `csx.xml` file and would _just know_ which data files and how to read them to perform postprocessing.
+
+![openems_proposed_octave_workflow.svg](res/openems_proposed_octave_workflow.svg)
+
+Alternatively, this is an Octave workflow based on a reworked API that would be compatible with proposed file format extension and thus the previous workflow.
+
+In Orange are the crucial parts :
+- The informations about port metaconstructions would have to be dumped to the `csx.xml` file at the same time as the regular informations.
+- The current `CalcNF2FF()` Octave function would have to be splitted into 3 new functions
+  - One that writes the `nf2ff_<>.xml` file.
+  - One that runs NF2FF.
+  - One that reads the NF2FF results.
 
 ## File format draft
 
@@ -93,10 +118,6 @@ Here is a draft of the XML file extension :
   </Meta>
   <PostProcessing>
     <NF2FF Name="Azimuth" File="nf2ff_azim.xml">
-      <!--
-        Could contain frequencies and angles in range form '[beg : step : end]'
-        for project manager to generate nf2ff.xml files.
-      -->
     </NF2FF>
     <!--
       Generated by the "postprocessing configuration" part of the project
@@ -111,6 +132,9 @@ Here is a draft of the XML file extension :
 - Automatic mesher : Cf. [OpenEMSH project](https://github.com/Open-RFlab/openemsh)
 - CSX XML file : Metadata paragraph (ports, NF2FF dump boxes, etc.)
 - CSX XML file : Postprocessing paragraph (NF2FF XML files, wanted datas)
+- Octave `CalcNF2FF()` : Support arbitrary file name & store correspondance in CSX file
+- Octave `WriteOpenEMS()` : Also dump port structure
+- Octave `oemshll_postprocess_from_file()`
 - AppCSXCAD / QCSXCAD : Metastructures creation (ports, NF2FF dump boxes, etc.)
 - AppCSXCAD / QCSXCAD : NF2FF management (XML file creation, angles visualisation)
 - NF2FF XML file : Support frequencies & angles ranges (like `[beg : step : end]`)
